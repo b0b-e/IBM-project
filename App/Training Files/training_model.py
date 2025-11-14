@@ -32,7 +32,8 @@ from sklearn.metrics import accuracy_score, classification_report
 # Configuration
 ##########################################################################
 # Resolve dataset and model directories relative to project root
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# NOTE: this file lives in `App/Training Files/` so we move two parents up
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / 'Dataset'
 MODEL_DIR = PROJECT_ROOT / 'Model'
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
@@ -182,5 +183,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-
+    
 print("All done.")
