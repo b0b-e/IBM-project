@@ -1,0 +1,26 @@
+# Ignore virtual environment
+.venv/
+venv/
+env/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore model artifacts if you are pushing large files
+Model/*.msix
+
+# Ignore OS/system files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore flask session files
+instance/
+
+# Ignore temporary files
+*.log
+*.tmp

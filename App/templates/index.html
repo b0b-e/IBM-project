@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Emotion Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      /* ---------- Theme / Layout ---------- */
+      :root{
+        --bg: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        --card: #ffffff;
+        --cyan: #06b6d4;
+        --cyan-light: #22d3ee;
+        --cyan-dark: #0891b2;
+        --muted: #94a3b8;
+        --text-dark: #0f172a;
+        --shadow-sm: 0 2px 8px rgba(6,182,212,0.08);
+        --shadow-md: 0 8px 30px rgba(6,182,212,0.12);
+        --shadow-lg: 0 20px 50px rgba(6,182,212,0.2);
+        --radius: 16px;
+      }
+      
+      *{box-sizing:border-box}
+      
+      html,body{
+        height:100%;
+        margin:0;
+        padding:0;
+      }
+      
+      body{
+        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:24px;
+        min-height:100vh;
+      }
+
+      /* Centered card with premium feel */
+      .card{
+        width:min(820px, 100%);
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        padding: 48px 40px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap: 24px;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .card::before{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--cyan), var(--cyan-light));
+        opacity: 0.8;
+      }
+
+      /* Title with better spacing */
+      h1{
+        font-size: 36px;
+        margin: 0;
+        color: var(--text-dark);
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        text-align: center;
+        line-height: 1.2;
+      }
+      
+      p.subtitle{
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        text-align: center;
+        font-weight: 400;
+        line-height: 1.5;
+      }
+
+      /* Form & Textarea with elegant glow */
+      form{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        align-items: center;
+        margin-top: 8px;
+      }
+      
+      .input-area{
+        width: 100%;
+        max-width: 720px;
+      }
+      
+      textarea{
+        width: 100%;
+        min-height: 160px;
+        padding: 18px 20px;
+        border-radius: 14px;
+        border: 2px solid #e0f2fe;
+        background: #fafbfc;
+        color: var(--text-dark);
+        font-size: 16px;
+        font-family: inherit;
+        resize: vertical;
+        outline: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        line-height: 1.6;
+      }
+      
+      textarea::placeholder{
+        color: #94a3b8;
+        font-weight: 400;
+      }
+      
+      textarea:focus{
+        border-color: var(--cyan);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1),
+                    0 8px 24px rgba(6, 182, 212, 0.15);
+        transform: translateY(-1px);
+      }
+
+      /* Button with smooth animations */
+      .actions{
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+      }
+      
+      button.submit-btn{
+        background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-dark) 100%);
+        color: white;
+        padding: 14px 32px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      button.submit-btn::before{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, var(--cyan-light) 0%, var(--cyan) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      
+      button.submit-btn:hover{
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: var(--shadow-lg);
+      }
+      
+      button.submit-btn:hover::before{
+        opacity: 1;
+      }
+      
+      button.submit-btn span{
+        position: relative;
+        z-index: 1;
+      }
+      
+      button.submit-btn:active{
+        transform: translateY(0) scale(0.98);
+      }
+
+      /* Results with larger emoji and bounce */
+      .results{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        margin-top: 16px;
+        padding: 20px;
+      }
+      
+      .emoji{
+        font-size: 96px;
+        line-height: 1;
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(-12px) scale(0.9);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: drop-shadow(0 4px 12px rgba(6,182,212,0.2));
+      }
+      
+      .emoji.visible{
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        animation: gentleBounce 0.6s ease-out;
+      }
+      
+      @keyframes gentleBounce{
+        0%{transform: translateY(-12px) scale(0.9)}
+        50%{transform: translateY(-4px) scale(1.05)}
+        70%{transform: translateY(2px) scale(0.98)}
+        100%{transform: translateY(0) scale(1)}
+      }
+      
+      .prediction-text{
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 22px;
+        text-align: center;
+        line-height: 1.4;
+        letter-spacing: -0.3px;
+      }
+
+      /* Error styling */
+      .error{
+        color: #dc2626;
+        background: #fef2f2;
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: 1px solid rgba(220, 38, 38, 0.1);
+        width: 100%;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      /* Footer */
+      footer{
+        margin-top: 24px;
+        color: var(--muted);
+        font-size: 13px;
+        text-align: center;
+        width: 100%;
+        font-weight: 400;
+      }
+
+      /* Responsive breakpoints */
+      @media (max-width: 768px){
+        .card{padding: 36px 28px}
+        h1{font-size: 30px}
+        .emoji{font-size: 80px}
+        textarea{min-height: 140px; font-size: 15px}
+        button.submit-btn{padding: 12px 28px; font-size: 15px}
+      }
+      
+      @media (max-width: 480px){
+        .card{padding: 28px 20px}
+        h1{font-size: 26px}
+        p.subtitle{font-size: 14px}
+        .emoji{font-size: 72px}
+        textarea{min-height: 120px; padding: 16px}
+        .prediction-text{font-size: 19px}
+      }
+    </style>
+    <script>
+      // Enter submits, Shift+Enter inserts newline in textarea
+      function textareaKeyHandler(e){
+        if(e.key === 'Enter' && !e.shiftKey){
+          e.preventDefault();
+          // find the enclosing form and submit
+          const f = e.target.form || document.querySelector('form');
+          if(f) f.requestSubmit();
+        }
+      }
+
+      // When page loads, attach handler and reveal emoji if present
+      document.addEventListener('DOMContentLoaded', function(){
+        const ta = document.querySelector('textarea[name="text"]');
+        if(ta) ta.addEventListener('keydown', textareaKeyHandler);
+
+        // Reveal emoji if prediction exists (initial render)
+        const emoji = document.querySelector('.emoji');
+        if(emoji && emoji.textContent.trim().length){
+          // small delay for nicer animation
+          setTimeout(()=> emoji.classList.add('visible'), 80);
+        }
+
+        // Intercept form submit and POST via fetch to avoid full-page reloads
+        const form = document.querySelector('form');
+        if(form){
+          form.addEventListener('submit', async function(e){
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if(submitBtn) submitBtn.disabled = true;
+            try{
+              const fd = new FormData(form);
+              const resp = await fetch(form.action, { method: 'POST', body: fd });
+              const html = await resp.text();
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(html, 'text/html');
+
+              // Replace or show server-rendered error
+              const newError = doc.querySelector('.error');
+              const oldError = document.querySelector('.error');
+              if(oldError) oldError.remove();
+              if(newError){
+                form.parentNode.insertBefore(newError.cloneNode(true), form);
+              }
+
+              // Update results area
+              const newResults = doc.querySelector('.results');
+              const currentResults = document.querySelector('.results');
+              if(newResults && currentResults){
+                currentResults.innerHTML = newResults.innerHTML;
+                const newEmoji = currentResults.querySelector('.emoji');
+                if(newEmoji){
+                  // animate
+                  setTimeout(()=> newEmoji.classList.add('visible'), 60);
+                }
+              }
+
+              // Clear textarea so reload starts empty and avoid resubmission alerts
+              const ta2 = form.querySelector('textarea[name="text"]');
+              if(ta2) ta2.value = '';
+            }catch(err){
+              console.error('Submit error', err);
+            }finally{
+              if(submitBtn) submitBtn.disabled = false;
+            }
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="card" role="main">
+      <h1>Emotion Detection</h1>
+      <p class="subtitle">Enter text and the model will predict the emotion.</p>
+
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+
+      <form action="/predict" method="post" autocomplete="off">
+        <div class="input-area">
+          <textarea name="text" placeholder="Type here..."></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="submit-btn"><span>Detect Emotion</span></button>
+        </div>
+      </form>
+
+      <div class="results">
+        {% if prediction %}
+          <div class="emoji">{{ emoji }}</div>
+          <div class="prediction-text">{{ prediction }}</div>
+        {% endif %}
+      </div>
+
+      <footer>Created by Ayush Banerjee — IBM Project Demonstration</footer>
+    </div>
+  </body>
+</html>
